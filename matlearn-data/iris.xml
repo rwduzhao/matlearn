@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<labels xmlns="http://mulan.sourceforge.net/labels">
+<label name="iris_setosa"></label>
+<label name="iris_versicolour"></label>
+<label name="iris_virginica"></label>
+</labels>
