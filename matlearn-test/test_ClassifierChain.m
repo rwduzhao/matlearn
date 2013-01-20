@@ -17,10 +17,12 @@ clc
 
 %% algorithm
 
-mlc = EnsembleClassifierChains();  % binary classifier
+mlc = ClassifierChain();  % binary classifier
 
+fprintf('building...\n')
 mlc.build(training.feature_matrix, training.label_matrix);
 
+fprintf('applying...\n')
 test.mlc.label_matrix = mlc.apply(test.feature_matrix);
 
 [test.mlc.eval.summary, test.mlc.eval.detail] = CommonMultiLabelEvaluators.evaluate(...
