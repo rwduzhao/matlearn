@@ -3,7 +3,6 @@ classdef EnsembleClassifierChain ...
         & matlearn.class.MultiLabelClassifier ...
         & matlearn.able.BaseMultiLabelClassifierable
     %ENSEMBLECLASSIFIERCHAINS
-    %
 
     properties
     end

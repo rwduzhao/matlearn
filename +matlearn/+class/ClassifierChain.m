@@ -30,6 +30,7 @@ classdef ClassifierChain ...
                     this.label_sequence = 1:n_label;
                 case 'manual'
                 case 'random'
+                    rng('shuffle')
                     this.label_sequence = randperm(n_label);
                 otherwise
                     error('Invalid label sequence mode name.')
@@ -38,6 +39,7 @@ classdef ClassifierChain ...
             augmented_feature_matrix_i = feature_matrix;
             for i_label = this.label_sequence
                 label_vector_i = label_matrix(:, i_label);
+                label_vector_i = double(label_vector_i);
 
                 this.member_classifiers{i_label} = this.base_classifier.clone();
                 this.member_classifiers{i_label}.build(augmented_feature_matrix_i, ...

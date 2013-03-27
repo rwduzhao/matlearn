@@ -23,12 +23,40 @@ classdef Ensemble ...
             switch this.ensemble_type
                 case 'bootstrap'
                     for i_ensemble = 1:this.n_ensemble_size
-                        % sampling with replacement
-                        sampling_ids = randsample(n_instance, n_sample_size, true);
-                        while length(unique(sampling_ids)) == 1
+                        n_resample = 0;
+                        is_to_resample = true;
+                        while is_to_resample
+                            if n_resample > 100
+                                error('Maximum resample times exceed.')
+                            end
+
+                            % sampling with replacement
                             sampling_ids = randsample(n_instance, n_sample_size, true);
+                            while length(unique(sampling_ids)) == 1
+                                sampling_ids = randsample(n_instance, n_sample_size, true);
+                            end
+
+                            sampled_label_matrix = label_matrix(sampling_ids, :);
+                            n_label = size(sampled_label_matrix, 2);
+
+                            if n_label == 1
+                                is_valid_sample = ...
+                                    length(unique(sampled_label_matrix)) == ...
+                                    length(unique(label_matrix));
+                            else
+                                is_valid_sample = ...
+                                    all(sum(sampled_label_matrix == 1, 1) > 0) && ...
+                                    all(sum(sampled_label_matrix ~= 1, 1) > 0);
+                            end
+
+                            if is_valid_sample
+                                sampling_id_matrix(i_ensemble, :) = sampling_ids;
+                                is_to_resample =false;
+                            else
+                                is_to_resample = true;
+                                n_resample = n_resample + 1;
+                            end
                         end
-                        sampling_id_matrix(i_ensemble, :) = sampling_ids;
                     end
                 otherwise
                     error('Invalid ensemble type name.')
@@ -50,12 +78,21 @@ classdef Ensemble ...
                 ensemble_result_i.prefitted = [];  % clear useless memory
                 if i_ensemble == 1
                     result.predicted = ensemble_result_i.predicted;
+                    result.predicted = double(result.predicted);
                 else
-                    result.predicted = result.predicted + ensemble_result_i.predicted;
+                    predicted_i = double(ensemble_result_i.predicted);
+                    result.predicted = result.predicted + predicted_i;
                 end
             end
             result.prefitted = result.predicted/this.n_ensemble_size;
             result.predicted = bsxfun(@ge, result.prefitted, this.decision_thresholds);
+
+            if any(isnan(result.prefitted(:)))
+                keyboard
+            end
+            if any(isnan(result.prefitted(:)))
+                keyboard
+            end
         end
     end
 
